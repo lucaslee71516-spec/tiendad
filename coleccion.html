@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda | Colección</title>
+    <style>
+        /* --- ESTILOS HEREDADOS (Misma identidad visual) --- */
+        :root {
+            --primary: #1a1a1a;
+            --accent: #d4a373;
+            --white: #ffffff;
+            --admin-bg: #2d3436;
+            --light-gray: #f4f4f4;
+        }
+        
+        body { font-family: 'Helvetica Neue', sans-serif; margin: 0; padding: 0; background-color: var(--white); color: var(--primary); overflow-x: hidden; }
+
+        /* --- HEADER & NAV --- */
+        header { background: var(--white); padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        nav ul { list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; }
+        nav a { text-decoration: none; color: var(--primary); font-weight: 500; transition: color 0.3s; }
+        nav a:hover, nav a.active { color: var(--accent); }
+        .cart-icon { cursor: pointer; font-size: 1.5rem; position: relative; }
+        .cart-count { background: var(--accent); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8rem; position: absolute; top: -5px; right: -10px; font-weight: bold;}
+
+        /* --- NUEVO: BARRA DE CATEGORÍAS (SECCIONES) --- */
+        .category-nav {
+            background-color: var(--light-gray);
+            padding: 20px 5%;
+            text-align: center;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .cat-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px 25px;
+            margin: 0 5px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .cat-btn:hover, .cat-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.4);
+        }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        .container { padding: 40px 5%; min-height: 60vh; }
+        .section-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-size: 2rem; text-transform: uppercase; margin: 0; }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .product-card { border: 1px solid #eee; transition: transform 0.3s; background: white; display: flex; flex-direction: column; position: relative; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .product-image { width: 100%; height: 300px; object-fit: cover; }
+        .product-info { padding: 15px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .product-category { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .product-title { margin: 5px 0; font-size: 1.1rem; }
+        .price { display: block; margin: 10px 0 15px 0; color: var(--accent); font-weight: bold; font-size: 1.1rem; }
+        
+        .btn { padding: 10px 0; width: 100%; background: var(--primary); color: white; border: none; cursor: pointer; text-transform: uppercase; font-weight: bold; transition: background 0.3s; }
+        .btn:hover { background: var(--accent); }
+
+        /* --- ADMIN PANEL (Igual pero con campo categoría) --- */
+        #admin-panel { background: var(--admin-bg); color: white; padding: 20px; border-bottom: 4px solid var(--accent); margin-bottom: 20px; }
+        .admin-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .admin-input { padding: 10px; border: none; border-radius: 4px; flex: 1; min-width: 150px; }
+        .admin-select { padding: 10px; border: none; border-radius: 4px; flex: 1; cursor: pointer; }
+        .admin-btn { background: var(--accent); color: white; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
+
+        /* --- SIDEBAR CARRITO (Reutilizado) --- */
+        #cart-sidebar { position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: right 0.3s ease; z-index: 1000; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        #cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .close-cart { font-size: 1.5rem; cursor: pointer; background: none; border: none; }
+        .cart-items-container { flex-grow: 1; overflow-y: auto; margin-top: 15px; }
+        .cart-item { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #f9f9f9; padding-bottom: 10px; align-items: center; }
+        .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        .cart-footer { margin-top: auto; padding-top: 20px; border-top: 2px solid #eee; }
+        .qty-controls button { width: 25px; height: 25px; cursor: pointer; }
+        
+        @media (max-width: 768px) { nav ul { display: none; } #cart-sidebar { width: 100%; } .admin-controls { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+    <div id="admin-panel">
+        <h3 style="margin-top:0;">🔧 Admin: Cargar Productos por Sección</h3>
+        <div class="admin-controls">
+            <input type="text" id="nuevo-nombre" class="admin-input" placeholder="Nombre Producto">
+            <input type="text" id="nuevo-precio" class="admin-input" placeholder="Precio">
+            <input type="text" id="nueva-foto" class="admin-input" placeholder="URL Foto">
+            
+            <select id="nueva-categoria" class="admin-select">
+                <option value="todos">Sin Categoría</option>
+                <option value="remeras">Remeras</option>
+                <option value="pantalones">Pantalones</option>
+                <option value="abrigos">Abrigos</option>
+                <option value="accesorios">Accesorios</option>
+            </select>
+
+            <button onclick="agregarProducto()" class="admin-btn">+ PUBLICAR</button>
+        </div>
+    </div>
+
+    <div id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Mi Carrito</h3>
+            <button class="close-cart" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-items-container" id="cart-items-list"></div>
+        <div class="cart-footer">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:1.2rem; margin-bottom:15px;">
+                <span>Total:</span> <span id="cart-total">$ 0</span>
+            </div>
+            <button style="width:100%; background:#e1306c; color:white; padding:15px; border:none; font-weight:bold; cursor:pointer;" onclick="irAlInstagram()">FINALIZAR COMPRA 📸</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">DIVA <span style="font-size:0.8rem; color:var(--accent);">COLECCIÓN</span></div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#" class="active">Colección</a></li>
+            </ul>
+        </nav>
+        <div class="cart-icon" onclick="toggleCart()">
+            🛒 <span class="cart-count" id="cart-count">0</span>
+        </div>
+    </header>
+
+    <div class="category-nav">
+        <button class="cat-btn active" onclick="filterProducts('todos', this)">Ver Todo</button>
+        <button class="cat-btn" onclick="filterProducts('remeras', this)">Remeras</button>
+        <button class="cat-btn" onclick="filterProducts('pantalones', this)">Pantalones</button>
+        <button class="cat-btn" onclick="filterProducts('abrigos', this)">Abrigos</button>
+        <button class="cat-btn" onclick="filterProducts('accesorios', this)">Accesorios</button>
+    </div>
+
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title" id="section-title-display">Todos los Productos</h2>
+        </div>
+        <div class="product-grid" id="product-list">
+            </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <script>
+        // CONFIGURACIÓN FIREBASE (MISMAS CLAVES)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCoFktFXJSr73W58NMbAG-oIqgODhx25Jw",
+            authDomain: "diva-e8e3f.firebaseapp.com",
+            projectId: "diva-e8e3f",
+            storageBucket: "diva-e8e3f.firebasestorage.app",
+            messagingSenderId: "467138288300",
+            appId: "1:467138288300:web:e9108f47987364a75ddd09",
+            measurementId: "G-00MVBM27C2"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- SISTEMA DE CARRITO CON LOCALSTORAGE (Para no perder datos al cambiar pagina) ---
+        let cart = JSON.parse(localStorage.getItem('divaCart')) || [];
+        updateCartUI(); // Cargar al inicio
+
+        function addToCart(id, nombre, precio, foto) {
+            let itemExistente = cart.find(item => item.id === id);
+            if (itemExistente) {
+                itemExistente.cantidad++;
+            } else {
+                cart.push({ id, nombre, precio: parseFloat(precio), foto, cantidad: 1 });
+            }
+            saveCart();
+            updateCartUI();
+            let sidebar = document.getElementById('cart-sidebar');
+            if(!sidebar.classList.contains('open')) toggleCart(); 
+        }
+
+        function cambiarCantidad(id, delta) {
+            let item = cart.find(item => item.id === id);
+            if (item) {
+                item.cantidad += delta;
+                if (item.cantidad <= 0) cart = cart.filter(i => i.id !== id);
+                saveCart();
+                updateCartUI();
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('divaCart', JSON.stringify(cart));
+        }
+
+        function updateCartUI() {
+            let totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            document.getElementById('cart-count').innerText = totalItems;
+            
+            const cartList = document.getElementById('cart-items-list');
+            const cartTotal = document.getElementById('cart-total');
+            
+            cartList.innerHTML = "";
+            let totalDinero = 0;
+
+            if (cart.length === 0) {
+                cartList.innerHTML = "<p style='text-align:center; color:#888; margin-top:20px;'>Vacío :(</p>";
+            } else {
+                cart.forEach((item) => {
+                    totalDinero += (item.precio * item.cantidad);
+                    cartList.innerHTML += `
+                        <div class="cart-item">
+                            <img src="${item.foto}" alt="foto">
+                            <div style="flex-grow:1;">
+                                <h4 style="margin:0;">${item.nombre}</h4>
+                                <span style="color:var(--accent); font-weight:bold;">$${item.precio.toLocaleString('es-AR')}</span>
+                                <div class="qty-controls" style="display:flex; align-items:center; gap:5px; margin-top:5px;">
+                                    <button onclick="cambiarCantidad('${item.id}', -1)">-</button>
+                                    <span>${item.cantidad}</span>
+                                    <button onclick="cambiarCantidad('${item.id}', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            cartTotal.innerText = "$ " + totalDinero.toLocaleString('es-AR');
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('open');
+        }
+
+        // --- SISTEMA DE FILTROS Y PRODUCTOS ---
+        let allProducts = []; // Guardamos copia local para filtrar rapido sin llamar a Firebase cada vez
+
+        db.collection("productos").onSnapshot((querySnapshot) => {
+            allProducts = [];
+            querySnapshot.forEach((doc) => {
+                let data = doc.data();
+                data.id = doc.id;
+                // Si el producto viejo no tiene categoria, le ponemos 'todos'
+                if(!data.categoria) data.categoria = 'todos';
+                allProducts.push(data);
+            });
+            renderProducts('todos'); // Mostrar todo al cargar
+        });
+
+        function renderProducts(filtro) {
+            const list = document.getElementById('product-list');
+            list.innerHTML = "";
+            
+            // Filtrar array
+            let productsToShow = allProducts;
+            if(filtro !== 'todos') {
+                productsToShow = allProducts.filter(p => p.categoria === filtro);
+            }
+
+            if(productsToShow.length === 0) {
+                list.innerHTML = `<p style="grid-column: 1/-1; text-align:center;">No hay productos en esta sección.</p>`;
+                return;
+            }
+
+            productsToShow.forEach(p => {
+                let precioVisual = parseFloat(p.precio).toLocaleString('es-AR');
+                let catLabel = p.categoria !== 'todos' ? p.categoria : '';
+                
+                list.innerHTML += `
+                    <div class="product-card">
+                        <img src="${p.foto}" alt="${p.nombre}" class="product-image">
+                        <div class="product-info">
+                            <div>
+                                <span class="product-category">${catLabel}</span>
+                                <h3 class="product-title">${p.nombre}</h3>
+                                <span class="price">$ ${precioVisual}</span>
+                            </div>
+                            <button class="btn" onclick="addToCart('${p.id}', '${p.nombre}', '${p.precio}', '${p.foto}')">Comprar</button>
+                            
+                            <button onclick="if(confirm('¿Borrar?')) db.collection('productos').doc('${p.id}').delete()" style="background:none; border:none; color:red; cursor:pointer; margin-top:10px; font-size:0.8rem;">Eliminar (Admin)</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterProducts(category, btnElement) {
+            // Actualizar UI botones
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            // Cambiar titulo
+            document.getElementById('section-title-display').innerText = category === 'todos' ? 'Todos los Productos' : category;
+
+            // Renderizar
+            renderProducts(category);
+        }
+
+        // --- FUNCION AGREGAR PRODUCTO (CON CATEGORIA) ---
+        function agregarProducto() {
+            const nombre = document.getElementById('nuevo-nombre').value;
+            const precioInput = document.getElementById('nuevo-precio').value;
+            const foto = document.getElementById('nueva-foto').value;
+            const categoria = document.getElementById('nueva-categoria').value; // Nuevo campo
+
+            if(!nombre || !precioInput || !foto) return alert("Faltan datos");
+
+            let precioNumero = parseFloat(precioInput.replace(/\./g, '').replace(/,/g, ''));
+
+            db.collection("productos").add({
+                nombre: nombre, 
+                precio: precioNumero, 
+                foto: foto, 
+                categoria: categoria, // Guardamos la categoria
+                fecha: new Date()
+            }).then(() => {
+                alert("Producto agregado en sección: " + categoria);
+                document.getElementById('nuevo-nombre').value = "";
+                document.getElementById('nuevo-precio').value = "";
+                document.getElementById('nueva-foto').value = "";
+            });
+        }
+        
+        async function irAlInstagram() {
+             if(cart.length === 0) return alert("Tu carrito está vacío.");
+             let mensaje = "Hola! Quiero encargar desde la Colección:\n\n";
+             cart.forEach(item => {
+                 mensaje += `- (${item.cantidad}) x ${item.nombre} ($${item.precio.toLocaleString('es-AR')} c/u)\n`;
+             });
+             let total = document.getElementById('cart-total').innerText;
+             mensaje += `\n*Total a pagar: ${total}*`;
+
+             try {
+                 await navigator.clipboard.writeText(mensaje);
+                 alert("✅ Pedido copiado. Pegalo en el chat de Instagram.");
+                 window.open("https://www.instagram.com/direct/t/100774001327072/");
+             } catch (err) {
+                 alert("Error al copiar. Tu pedido:\n" + mensaje);
+             }
+        }
+    </script>
+</body>
+</html>
