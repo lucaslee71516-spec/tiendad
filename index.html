@@ -4,348 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda DIVA | Moda & Estilo</title>
-    <style>
-        /* --- ESTILOS BASE --- */
-        :root { 
-            --primary: #1a1a1a; 
-            --accent: #d4a373; 
-            --accent-hover: #b58b5c;
-            --white: #ffffff; 
-            --bg-light: #f8f9fa;
-            --footer-bg: #eaeaea; 
-            --admin-bg: #2d3436; 
-            --radius: 8px;
-        }
-        
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-light); color: var(--primary); overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
-
-        /* HEADER */
-        header { background: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        
-        .left-section { display: flex; align-items: center; gap: 25px; }
-        .logo { font-size: 1.8rem; font-weight: 800; cursor: pointer; letter-spacing: -1px; }
-        
-        .social-icons { display: flex; gap: 12px; align-items: center; }
-        .social-link { color: var(--primary); display: flex; align-items: center; transition: 0.3s; text-decoration: none; }
-        .social-link svg { width: 20px; height: 20px; fill: currentColor; }
-        .social-link:hover { color: var(--accent); transform: translateY(-2px); }
-
-        nav ul { list-style: none; display: flex; gap: 25px; margin: 0; padding: 0; align-items: center; }
-        nav a { text-decoration: none; color: var(--primary); font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.95rem; }
-        nav a.active, nav a:hover { color: var(--accent); }
-        
-        .header-icons { display: flex; gap: 20px; align-items: center; }
-        .icon-btn { cursor: pointer; font-size: 1.3rem; position: relative; background: none; border: none; padding: 0; }
-        .cart-count { background: var(--accent); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; position: absolute; top: -5px; right: -8px; font-weight: bold;}
-        
-        /* USUARIO */
-        #user-info { display: flex; align-items: center; gap: 10px; }
-        #user-display { font-size: 0.85rem; font-weight: bold; color: var(--accent); display: none; align-items: center; gap: 10px;}
-        #btn-login-trigger { font-weight: 700; border: 2px solid #eee; background: white; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; }
-
-        /* VISTAS */
-        .view-section { display: none; animation: fadeIn 0.4s ease-out; flex: 1; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* HERO (PORTADA CON CARRUSEL) */
-        .hero { 
-            position: relative; 
-            height: 60vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            text-align: center; 
-            color: var(--white); 
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        .hero-bg-container {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            cursor: pointer; 
-        }
-
-        .hero-slide {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: contain; 
-            object-position: center;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-        }
-
-        .hero-slide.active { opacity: 1; }
-
-        .hero-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.35);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-content h1 { font-size: 3rem; margin-bottom: 10px; font-weight: 800; }
-
-        .hero-indicators {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 3;
-        }
-
-        .indicator-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .indicator-dot.active {
-            background: white;
-            transform: scale(1.2);
-        }
-        
-        /* BOTONES GENÉRICOS */
-        .btn { padding: 12px 25px; background: var(--accent); color: white; border: none; cursor: pointer; text-transform: uppercase; font-weight: 700; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
-        .btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
-        .btn-outline { background: transparent; border: 2px solid white; margin-left: 10px; }
-        .btn-outline:hover { background: white; color: var(--primary); }
-
-        /* --- ESTILOS MODAL AUTH --- */
-        .auth-box { background: white; padding: 40px; border-radius: 0; width: 100%; max-width: 500px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .auth-title { text-align: center; font-size: 2rem; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; letter-spacing: -1px; margin-top: 0; }
-        .auth-subtitle { text-align: center; font-size: 0.85rem; margin-bottom: 30px; color: #333; text-transform: uppercase; font-weight: 600; }
-        .custom-input-container { position: relative; margin-bottom: 15px; }
-        .custom-input { width: 100%; padding: 12px 15px; border: 1px solid #000; font-size: 0.9rem; box-sizing: border-box; border-radius: 0; outline: none; color: #555; font-family: inherit; }
-        .custom-input::placeholder { color: #bbb; }
-        .custom-input:focus { border-width: 2px; border-color: black; }
-        .eye-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; color: #000; }
-        .btn-black { width: 100%; background: #000; color: white; padding: 15px; border: none; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; cursor: pointer; margin-top: 10px; transition: 0.3s; border-radius: 0; }
-        .btn-black:hover { background: #333; }
-        .forgot-pass { display: block; text-align: center; margin: 20px 0; text-decoration: underline; color: #000; cursor: pointer; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
-        .switch-auth-text { text-align: center; margin-top: 30px; font-size: 0.8rem; text-transform: uppercase; font-weight: 600; color: #333; }
-        .auth-view { display: none; }
-        .auth-view.active { display: block; animation: fadeIn 0.3s; }
-
-        /* FILTROS */
-        .audience-nav { display: flex; justify-content: center; margin-top: 30px; gap: 15px; }
-        .aud-btn { background: transparent; border: none; font-size: 1.1rem; font-weight: 700; padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; color: #999; transition: 0.3s; }
-        .aud-btn.active { color: var(--primary); border-bottom-color: var(--accent); }
-        .category-nav { background-color: white; padding: 15px 5%; text-align: center; overflow-x: auto; white-space: nowrap; margin-top: 15px; }
-        .cat-btn { background: #f1f1f1; border: none; padding: 8px 20px; margin: 0 5px; border-radius: 30px; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: #555; }
-        .cat-btn.active { background: var(--accent); color: white; }
-
-        /* GRILLA */
-        .container { padding: 40px 5%; min-height: 60vh; max-width: 1400px; margin: 0 auto; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
-        .product-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.3s; position: relative; display: flex; flex-direction: column; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .card-img-container { position: relative; overflow: hidden; height: 320px; cursor: pointer; }
-        .product-image { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .product-card:hover .product-image { transform: scale(1.05); }
-        .zoom-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); color: white; padding: 10px 20px; border-radius: 30px; opacity: 0; transition: 0.3s; pointer-events: none; }
-        .card-img-container:hover .zoom-hint { opacity: 1; }
-        .admin-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 10; }
-        .btn-round-action { width: 35px; height: 35px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; background: white; }
-        .btn-edit { color: #2196F3; } 
-        .btn-delete { color: #F44336; } 
-        .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-title { margin: 5px 0; font-size: 1.1rem; font-weight: 600; }
-        .product-price { color: var(--accent); font-weight: 800; font-size: 1.2rem; }
-        
-        /* --- ADMIN PANEL --- */
-        #admin-panel { display: none; background: var(--admin-bg); color: white; padding: 30px 5%; margin-bottom: 20px; }
-        .admin-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .admin-input, .admin-textarea { padding: 10px; border-radius: 6px; border: 1px solid #444; background: #3d4648; color: white; width: 100%; box-sizing: border-box;}
-        .admin-textarea { resize: vertical; min-height: 80px; font-family: inherit; }
-        
-        .admin-section-title {
-            margin-top: 30px;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #555;
-            color: var(--accent);
-            text-transform: uppercase;
-        }
-
-        /* SELECTOR DE TALLES (Admin) */
-        .talles-selector { background: #3d4648; padding: 10px; border-radius: 6px; border: 1px solid #444; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .talle-checkbox label { cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; user-select: none; }
-        
-        /* --- MODALES --- */
-        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 3000; align-items:center; justify-content:center; animation: fadeIn 0.3s; }
-        .modal-content-product { background: white; width: 90%; max-width: 950px; height: 85vh; border-radius: var(--radius); overflow: hidden; display: flex; position: relative; }
-        .modal-img-side { width: 60%; height: 100%; background: #f8f8f8; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
-        .main-img-view { flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 15px;}
-        .main-img-view img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .gallery-thumbs { height: 70px; display: flex; gap: 10px; justify-content: center; overflow-x: auto; }
-        .thumb { width: 60px; height: 60px; border-radius: 4px; cursor: pointer; object-fit: cover; border: 2px solid transparent; opacity: 0.7; }
-        .thumb:hover { border-color: var(--accent); opacity: 1; }
-        .modal-info-side { width: 40%; padding: 40px; display: flex; flex-direction: column; overflow-y: auto; background: white; }
-        .close-modal-prod { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; border: none; background: none; }
-        .modal-desc-text { color:#666; line-height:1.6; margin-bottom:20px; white-space: pre-line; }
-        .modal-sizes-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
-        .size-btn { padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 4px; font-weight: bold; color: #333; cursor: pointer; transition: 0.2s; }
-        .size-btn:hover { border-color: var(--primary); }
-        .size-btn.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
-        .modal-content-edit { background: white; width: 90%; max-width: 600px; padding: 30px; border-radius: var(--radius); position: relative; max-height: 90vh; overflow-y: auto; }
-        .edit-form-grid { display: grid; gap: 15px; }
-
-        /* CARRITO */
-        #cart-sidebar { position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.1); transition: 0.3s; z-index: 1000; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; }
-        #cart-sidebar.open { right: 0; }
-        .cart-items-container { flex-grow: 1; overflow-y: auto; margin-top: 20px; }
-        .cart-item { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; align-items: center; }
-        .cart-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
-        .qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px; background: #f9f9f9; padding: 3px; border-radius: 5px; width: fit-content; }
-        .qty-btn { width: 25px; height: 25px; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* --- FOOTER --- */
-        footer {
-            background-color: var(--footer-bg);
-            padding: 50px 5% 20px;
-            text-align: center;
-            margin-top: auto;
-            border-top: 1px solid #ddd;
-        }
-
-        .footer-newsletter {
-            max-width: 500px;
-            margin: 0 auto 40px;
-        }
-
-        .newsletter-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid black;
-            background: white;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            box-sizing: border-box;
-            outline: none;
-            text-align: center;
-        }
-
-        .newsletter-btn {
-            width: 100%;
-            background: black;
-            color: white;
-            padding: 12px;
-            border: none;
-            text-transform: uppercase;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 5px;
-            transition: 0.3s;
-        }
-        
-        .newsletter-btn:hover { background: #333; }
-
-        .footer-social-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .footer-social-icons {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .footer-social-icons a {
-            color: black;
-            transition: 0.3s;
-            display: block;
-        }
-
-        .footer-social-icons svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-            cursor: pointer;
-        }
-        
-        .footer-social-icons a:hover { color: var(--accent); transform: scale(1.1); }
-
-        .footer-hours h4 {
-            margin: 0;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-        }
-
-        .footer-hours p {
-            margin: 5px 0 0;
-            font-size: 0.8rem;
-            color: #555;
-            text-transform: uppercase;
-        }
-
-        .footer-copyright {
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-            font-size: 0.75rem;
-            color: #666;
-            text-transform: uppercase;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 768px) { 
-            .modal-content-product { flex-direction: column; height: 95vh; }
-            .modal-img-side { width: 100%; height: 50%; padding: 10px; }
-            .modal-info-side { width: 100%; height: 50%; padding: 20px; }
-            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-            .left-section { gap: 10px; }
-            .social-icons { display: none; }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
     <div id="auth-modal" class="modal-overlay">
         <div class="auth-box">
             <button class="close-modal-prod" style="font-size:2rem; top:10px; right:15px; color:black;" onclick="closeModal('auth-modal')">×</button>
+            
             <div id="view-login-form" class="auth-view active">
                 <h2 class="auth-title">Inicio de Sesión</h2>
                 <p class="auth-subtitle">SI YA TENÉS CUENTA CREADA, COMPLETÁ LOS SIGUIENTES CAMPOS</p>
                 <div class="custom-input-container"><input type="email" id="login-email" class="custom-input" placeholder="Correo Electrónico" autocapitalize="off"></div>
                 <div class="custom-input-container"><input type="password" id="login-pass" class="custom-input" placeholder="Contraseña" autocapitalize="off"><span class="eye-icon" onclick="togglePass('login-pass')">👁️</span></div>
                 <button class="btn-black" onclick="loginUser()">Iniciar Sesión</button>
-                <a class="forgot-pass" onclick="alert('Funcionalidad de recuperar contraseña pendiente de configurar en Firebase')">OLVIDE MI CONTRASEÑA</a>
+                <a class="forgot-pass" onclick="toggleAuthView('forgot')">OLVIDE MI CONTRASEÑA</a>
                 <div class="switch-auth-text">Si todavía no tenés una cuenta creada, tocá el botón "Registro"</div>
                 <button class="btn-black" style="margin-top:10px;" onclick="toggleAuthView('register')">Registro</button>
             </div>
+
             <div id="view-register-form" class="auth-view">
                 <h2 class="auth-title">Registro</h2>
-                <div class="custom-input-container"><input type="text" id="reg-dni" class="custom-input" placeholder="CUIT O DNI"></div>
-                <div class="custom-input-container"><input type="text" id="reg-nombre" class="custom-input" placeholder="Nombre"></div>
-                <div class="custom-input-container"><input type="text" id="reg-apellido" class="custom-input" placeholder="Apellido"></div>
+                <div class="custom-input-container">
+                    <input type="text" id="reg-dni" class="custom-input" placeholder="DNI (8 dígitos sin puntos)" maxlength="8" inputmode="numeric">
+                </div>
+                <div class="custom-input-container"><input type="text" id="reg-nombre" class="custom-input" placeholder="Nombre (Solo letras)"></div>
+                <div class="custom-input-container"><input type="text" id="reg-apellido" class="custom-input" placeholder="Apellido (Solo letras)"></div>
                 <div class="custom-input-container"><input type="email" id="reg-email" class="custom-input" placeholder="E-Mail" autocapitalize="off"></div>
-                <div class="custom-input-container"><input type="tel" id="reg-celular" class="custom-input" placeholder="Celular (Sin 0 ni 15)"></div>
+                <div class="custom-input-container">
+                    <input type="tel" id="reg-celular" class="custom-input" placeholder="Celular (10 dígitos, sin 0 ni 15)">
+                </div>
                 <div class="custom-input-container"><input type="password" id="reg-pass" class="custom-input" placeholder="Contraseña" autocapitalize="off"><span class="eye-icon" onclick="togglePass('reg-pass')">👁️</span></div>
                 <div class="custom-input-container"><input type="password" id="reg-pass-conf" class="custom-input" placeholder="Confirmar Contraseña" autocapitalize="off"><span class="eye-icon" onclick="togglePass('reg-pass-conf')">👁️</span></div>
                 <button class="btn-black" onclick="registerUser()">Registrate</button>
                 <div style="text-align:center; margin-top:15px;"><a style="cursor:pointer; text-decoration:underline; font-size:0.8rem; text-transform:uppercase;" onclick="toggleAuthView('login')">Volver al inicio de sesión</a></div>
             </div>
+
+            <div id="view-forgot-pass" class="auth-view">
+                <h2 class="auth-title">Recuperar Cuenta</h2>
+                <p class="auth-subtitle">Validaremos tus datos para enviarte un link de restauración</p>
+                <div class="custom-input-container"><input type="email" id="rec-email" class="custom-input" placeholder="Tu E-mail Registrado"></div>
+                <div class="custom-input-container"><input type="text" id="rec-dni" class="custom-input" placeholder="Tu DNI (8 dígitos)"></div>
+                <div class="custom-input-container"><input type="tel" id="rec-celular" class="custom-input" placeholder="Tu Celular Registrado"></div>
+                <button class="btn-black" onclick="validateAndRecover()">Validar y Recuperar</button>
+                <div style="text-align:center; margin-top:15px;"><a style="cursor:pointer; text-decoration:underline; font-size:0.8rem; text-transform:uppercase;" onclick="toggleAuthView('login')">Cancelar y Volver</a></div>
+            </div>
+
         </div>
     </div>
 
@@ -387,11 +91,9 @@
         <div class="left-section">
             <div class="logo" onclick="switchView('home')">DIVA</div>
             <div class="social-icons">
-                <a href="https://wa.me/5491100000000" target="_blank" class="social-link">
-                    <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                </a>
-                <a href="https://www.facebook.com" target="_blank" class="social-link"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <a href="https://wa.me/5491100000000" target="_blank" class="social-link"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></a>
                 <a href="https://www.instagram.com" target="_blank" class="social-link"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                <a href="https://www.facebook.com" target="_blank" class="social-link"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
                 <a href="https://www.tiktok.com" target="_blank" class="social-link"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v6.14c0 3.48-2.63 5.76-5.35 5.76-2.92 0-5.25-2.33-5.25-5.25s2.33-5.25 5.25-5.25c.57 0 1.13.09 1.67.26v4.09c-.27-.14-.58-.23-.89-.23-1.07 0-1.94.87-1.94 1.94s.87 1.94 1.94 1.94c1.07 0 1.94-.87 1.94-1.94V.02z"/></svg></a>
             </div>
         </div>
@@ -417,8 +119,7 @@
 
     <div id="view-home" class="view-section active">
         <section class="hero" id="hero-section">
-            <div class="hero-bg-container" id="hero-slides">
-                </div>
+            <div class="hero-bg-container" id="hero-slides"></div>
             <div class="hero-overlay"></div>
             <div class="hero-content">
                 <h1>Moda para Todos</h1>
@@ -428,7 +129,6 @@
                     <button class="btn btn-outline" onclick="switchView('collection', 'infantiles')">Infantiles</button>
                 </div>
             </div>
-            <div class="hero-indicators" id="hero-indicators"></div>
         </section>
     </div>
 
@@ -452,6 +152,15 @@
                     <label style="display:block; margin-bottom:5px; font-size:0.9rem;">URLs de Imágenes (Separadas por coma):</label>
                     <textarea id="banner-urls" class="admin-textarea" placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/foto2.jpg"></textarea>
                     <button onclick="saveBannerConfig()" class="btn" style="margin-top:10px;">Guardar Banner</button>
+                </div>
+            </div>
+
+            <div class="admin-section-title">📄 Data Fiscal (Footer)</div>
+            <div class="admin-controls">
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; margin-bottom:5px; font-size:0.9rem;">URL de la Imagen Data Fiscal:</label>
+                    <input type="text" id="data-fiscal-url" class="admin-input" placeholder="https://www.afip.gob.ar/images/f960/DATAWEB.jpg">
+                    <button onclick="saveDataFiscalConfig()" class="btn" style="margin-top:10px;">Guardar Data Fiscal</button>
                 </div>
             </div>
         </div>
@@ -479,32 +188,23 @@
             <input type="email" placeholder="E-MAIL" class="newsletter-input">
             <button class="newsletter-btn" onclick="alert('Gracias por suscribirte')">SUSCRIBITE AL NEWSLETTER</button>
         </div>
-
         <div class="footer-social-section">
             <div class="footer-social-icons">
-                 <a href="https://wa.me/5491100000000" target="_blank">
-                    <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                </a>
-                 <a href="https://www.instagram.com" target="_blank">
-                    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                </a>
-                <a href="https://www.facebook.com" target="_blank">
-                    <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </a>
-                <a href="https://www.tiktok.com" target="_blank">
-                    <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v6.14c0 3.48-2.63 5.76-5.35 5.76-2.92 0-5.25-2.33-5.25-5.25s2.33-5.25 5.25-5.25c.57 0 1.13.09 1.67.26v4.09c-.27-.14-.58-.23-.89-.23-1.07 0-1.94.87-1.94 1.94s.87 1.94 1.94 1.94c1.07 0 1.94-.87 1.94-1.94V.02z"/></svg>
-                </a>
+                 <a href="https://wa.me/5491100000000" target="_blank"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></a>
+                 <a href="https://www.instagram.com" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                 <a href="https://www.facebook.com" target="_blank"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                 <a href="https://www.tiktok.com" target="_blank"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v6.14c0 3.48-2.63 5.76-5.35 5.76-2.92 0-5.25-2.33-5.25-5.25s2.33-5.25 5.25-5.25c.57 0 1.13.09 1.67.26v4.09c-.27-.14-.58-.23-.89-.23-1.07 0-1.94.87-1.94 1.94s.87 1.94 1.94 1.94c1.07 0 1.94-.87 1.94-1.94V.02z"/></svg></a>
             </div>
-            
             <div class="footer-hours">
                 <h4>HORARIOS DE ATENCIÓN</h4>
                 <p>LUNES A SÁBADO DE 9:30 A 18:30HS</p>
             </div>
+            <div class="footer-data-fiscal">
+                <img id="footer-afip-img" src="https://www.afip.gob.ar/images/f960/DATAWEB.jpg" alt="Data Fiscal">
+            </div>
         </div>
-
         <div class="footer-copyright">
             <p>©2026 DIVA TODOS LOS DERECHOS RESERVADOS</p>
-            <p>TÉRMINOS Y CONDICIONES - POLÍTICAS DE PRIVACIDAD</p>
         </div>
     </footer>
 
@@ -512,371 +212,14 @@
         <h3 style="border-bottom:1px solid #eee; padding-bottom:15px; margin-top:0;">Tu Carrito <button onclick="toggleCart()" style="float:right; border:none; background:none; cursor:pointer; font-size:1.5rem;">×</button></h3>
         <div class="cart-items-container" id="cart-items-list"></div>
         <div style="margin-top:auto; padding-top:20px; border-top:1px solid #eee;">
-            <p style="display:flex; justify-content:space-between; margin:5px 0; font-size:0.9rem; color:#666;"><span>Subtotal:</span> <span id="cart-subtotal">$ 0</span></p>
-            <p style="display:flex; justify-content:space-between; margin:5px 0; font-size:0.9rem; color:#666;"><span>Envío (10%):</span> <span id="cart-envio">$ 0</span></p>
-            <p style="font-weight:bold; font-size:1.4rem; display:flex; justify-content:space-between; margin-top:15px;"><span>Total:</span> <span id="cart-total">$ 0</span></p>
-            <button class="btn" style="width:100%; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); margin-top:10px;" onclick="finalizarPedidoInstagram()">Finalizar en Instagram</button>
+            <p style="font-weight:bold; font-size:1.4rem; display:flex; justify-content:space-between;"><span>Total:</span> <span id="cart-total">$ 0</span></p>
+            <button class="btn" style="width:100%; background:#25D366; margin-top:10px;" onclick="irAlWhatsapp()">Finalizar Pedido en WhatsApp</button>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-
-    <script>
-        // --- CONFIGURACIÓN FIREBASE (COMPLETAR AQUÍ) ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyCoFktFXJSr73W58NMbAG-oIqgODhx25Jw",
-            authDomain: "diva-e8e3f.firebaseapp.com",
-            projectId: "diva-e8e3f",
-            storageBucket: "diva-e8e3f.firebasestorage.app",
-            messagingSenderId: "467138288300",
-            appId: "1:467138288300:web:e9108f47987364a75ddd09",
-            measurementId: "G-00MVBM27C2"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        // --- CONSTANTES Y VARIABLES ---
-        const ADMIN_EMAIL = "pepito@gmail.com"; 
-
-        let currentAudience = 'todos';
-        let currentCategory = 'todos';
-        let allProducts = [];
-        let cart = [];
-        let cartUnsubscribe = null;
-        let selectedSize = null; 
-        
-        // --- LÓGICA DEL CARRUSEL DE BANNERS ---
-        let heroImages = [
-            'https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80'
-        ];
-        let currentSlide = 0;
-        let slideInterval;
-
-        function startHeroCarousel() {
-            const container = document.getElementById('hero-slides');
-            const indicatorsContainer = document.getElementById('hero-indicators'); 
-            if(!container || !indicatorsContainer) return;
-            container.innerHTML = "";
-            indicatorsContainer.innerHTML = ""; 
-            
-            // Crear elementos img y puntos indicadores
-            heroImages.forEach((url, index) => {
-                // Imagen
-                const img = document.createElement('img');
-                img.src = url;
-                img.classList.add('hero-slide');
-                if(index === 0) img.classList.add('active');
-                container.appendChild(img);
-
-                // Punto indicador
-                const dot = document.createElement('div');
-                dot.classList.add('indicator-dot');
-                if(index === 0) dot.classList.add('active');
-                dot.onclick = (e) => {
-                    e.stopPropagation(); 
-                    goToSlide(index);
-                };
-                indicatorsContainer.appendChild(dot);
-            });
-
-            // Click para PAUSAR
-            container.onclick = function() {
-                if(slideInterval) {
-                    clearInterval(slideInterval);
-                    slideInterval = null;
-                }
-            };
-
-            // Iniciar intervalo automático
-            startInterval();
-        }
-
-        function startInterval() {
-            if(slideInterval) clearInterval(slideInterval);
-            if(heroImages.length > 1) {
-                slideInterval = setInterval(() => {
-                    goToSlide((currentSlide + 1) % heroImages.length, true);
-                }, 5000); 
-            }
-        }
-
-        function goToSlide(index, isAuto = false) {
-            if(!isAuto && slideInterval) {
-                 clearInterval(slideInterval);
-                 slideInterval = null;
-            }
-
-            const slides = document.querySelectorAll('.hero-slide');
-            const dots = document.querySelectorAll('.indicator-dot');
-            if(slides.length === 0) return;
-
-            slides[currentSlide].classList.remove('active');
-            if(dots[currentSlide]) dots[currentSlide].classList.remove('active');
-
-            currentSlide = index;
-            slides[currentSlide].classList.add('active');
-            if(dots[currentSlide]) dots[currentSlide].classList.add('active');
-        }
-
-
-        // Cargar Configuración del Banner desde Firestore
-        db.collection('settings').doc('hero').onSnapshot(doc => {
-            if(doc.exists && doc.data().images && doc.data().images.length > 0) {
-                heroImages = doc.data().images;
-            }
-            const bannerInput = document.getElementById('banner-urls');
-            if(bannerInput) bannerInput.value = heroImages.join(', ');
-
-            startHeroCarousel();
-        });
-
-        // Guardar Configuración del Banner (Admin)
-        function saveBannerConfig() {
-            const raw = document.getElementById('banner-urls').value;
-            if(!raw) return alert("Ingresa al menos una URL");
-            const urls = raw.split(',').map(u => u.trim()).filter(u => u.length > 0);
-            
-            db.collection('settings').doc('hero').set({ images: urls })
-                .then(() => alert("Banner actualizado!"))
-                .catch(e => alert("Error: " + e.message));
-        }
-
-        // --- AUTH: ESTADO Y LOGICA UI ---
-        auth.onAuthStateChanged(user => {
-            const btnLogin = document.getElementById('btn-login-trigger');
-            const userDisplay = document.getElementById('user-display');
-            const adminPanel = document.getElementById('admin-panel');
-
-            if (user) {
-                btnLogin.style.display = 'none';
-                userDisplay.style.display = 'flex';
-                document.getElementById('user-email-text').innerText = "Hola, " + user.email.split('@')[0];
-                adminPanel.style.display = (user.email === ADMIN_EMAIL) ? 'block' : 'none';
-                cartUnsubscribe = db.collection('carts').doc(user.uid)
-                    .onSnapshot((doc) => {
-                        cart = doc.exists ? (doc.data().items || []) : [];
-                        renderCartUI();
-                    });
-            } else {
-                btnLogin.style.display = 'block';
-                userDisplay.style.display = 'none';
-                adminPanel.style.display = 'none';
-                if (cartUnsubscribe) cartUnsubscribe();
-                cart = [];
-                renderCartUI();
-            }
-            if(document.getElementById('view-collection').classList.contains('active')) renderProducts();
-        });
-
-        // --- FUNCIONES DE AUTH ---
-        function openAuth() { toggleAuthView('login'); document.getElementById('auth-modal').style.display = 'flex'; }
-        function toggleAuthView(view) {
-            document.getElementById('view-login-form').classList.remove('active');
-            document.getElementById('view-register-form').classList.remove('active');
-            if(view === 'login') document.getElementById('view-login-form').classList.add('active');
-            else document.getElementById('view-register-form').classList.add('active');
-        }
-        function togglePass(id) {
-            const input = document.getElementById(id);
-            if (input.type === "password") input.type = "text"; else input.type = "password";
-        }
-        function registerUser() { 
-            const dni = document.getElementById('reg-dni').value;
-            const nombre = document.getElementById('reg-nombre').value;
-            const apellido = document.getElementById('reg-apellido').value;
-            const email = document.getElementById('reg-email').value;
-            const celular = document.getElementById('reg-celular').value;
-            const pass = document.getElementById('reg-pass').value;
-            const passConf = document.getElementById('reg-pass-conf').value;
-            if(!dni || !nombre || !apellido || !email || !celular || !pass) return alert("Por favor completá todos los campos.");
-            if(pass !== passConf) return alert("Las contraseñas no coinciden.");
-            if(pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
-            auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
-                const user = userCredential.user;
-                return db.collection('users').doc(user.uid).set({dni, nombre, apellido, email, celular, fechaRegistro: new Date()});
-            }).then(() => {
-                alert("¡Cuenta creada con éxito! Bienvenido " + nombre);
-                closeModal('auth-modal');
-                document.getElementById('reg-dni').value = ''; document.getElementById('reg-nombre').value = ''; document.getElementById('reg-apellido').value = ''; document.getElementById('reg-email').value = ''; document.getElementById('reg-celular').value = ''; document.getElementById('reg-pass').value = ''; document.getElementById('reg-pass-conf').value = '';
-            }).catch((error) => { console.error(error); alert("Error: " + error.message); });
-        }
-        function loginUser(){
-            const e = document.getElementById('login-email').value, p = document.getElementById('login-pass').value;
-            if(!e || !p) return alert("Ingresa email y contraseña");
-            auth.signInWithEmailAndPassword(e, p).then(() => closeModal('auth-modal')).catch((error) => alert("Error de credenciales: Verificá tu email y contraseña."));
-        }
-        function logoutUser(){ auth.signOut(); }
-
-        // --- LOGICA DE PRODUCTOS (CRUD) ---
-        function agregarProducto() {
-            if(!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) return alert("Solo admin.");
-            const n = document.getElementById('nuevo-nombre').value, p = parseFloat(document.getElementById('nuevo-precio').value), desc = document.getElementById('nuevo-desc').value;
-            const checkboxes = document.querySelectorAll('input[name="nuevo-talle"]:checked');
-            const talles = Array.from(checkboxes).map(cb => cb.value);
-            const f1 = document.getElementById('foto1').value, f2 = document.getElementById('foto2').value, f3 = document.getElementById('foto3').value;
-            let fotos = [f1]; if(f2) fotos.push(f2); if(f3) fotos.push(f3);
-            const c = document.getElementById('nueva-categoria').value, pub = document.getElementById('nuevo-publico').value;
-            if(!n || !p || !f1) return alert("Faltan datos");
-            db.collection("productos").add({nombre: n, precio: p, descripcion: desc, talles: talles, foto: f1, fotos: fotos, categoria: c, publico: pub, fecha: new Date()}).then(() => alert("Publicado!")).catch(e => alert(e.message));
-        }
-        function abrirEditor(event, id) {
-            event.stopPropagation();
-            const p = allProducts.find(item => item.id === id); if (!p) return;
-            document.getElementById('edit-id').value = p.id; document.getElementById('edit-nombre').value = p.nombre; document.getElementById('edit-precio').value = p.precio; document.getElementById('edit-desc').value = p.descripcion || ''; document.getElementById('edit-publico').value = p.publico; document.getElementById('edit-categoria').value = p.categoria; document.getElementById('edit-foto1').value = p.images[0] || ''; document.getElementById('edit-foto2').value = p.images[1] || ''; document.getElementById('edit-foto3').value = p.images[2] || '';
-            document.querySelectorAll('input[name="edit-talle"]').forEach(cb => cb.checked = p.talles && p.talles.includes(cb.value));
-            document.getElementById('edit-modal').style.display = 'flex';
-        }
-        function guardarEdicion() {
-            if(!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) return alert("Sin permisos");
-            const id = document.getElementById('edit-id').value, n = document.getElementById('edit-nombre').value, p = parseFloat(document.getElementById('edit-precio').value), desc = document.getElementById('edit-desc').value;
-            const talles = Array.from(document.querySelectorAll('input[name="edit-talle"]:checked')).map(cb => cb.value);
-            const f1 = document.getElementById('edit-foto1').value, f2 = document.getElementById('edit-foto2').value, f3 = document.getElementById('edit-foto3').value;
-            let fotos = []; if(f1) fotos.push(f1); if(f2) fotos.push(f2); if(f3) fotos.push(f3);
-            db.collection("productos").doc(id).update({nombre: n, precio: p, descripcion: desc, talles: talles, fotos: fotos, foto: fotos[0], publico: document.getElementById('edit-publico').value, categoria: document.getElementById('edit-categoria').value}).then(() => { alert("Actualizado"); closeModal('edit-modal'); });
-        }
-        function borrarProd(event, id) { event.stopPropagation(); if(confirm("¿Eliminar?")) db.collection("productos").doc(id).delete(); }
-
-        // --- UI DETALLES Y CARRITO ---
-        function openProductModal(id) {
-            const p = allProducts.find(x => x.id === id); if(!p) return;
-            selectedSize = null;
-            document.getElementById('modal-img-main').src = p.images[0];
-            const gallery = document.getElementById('modal-gallery'); gallery.innerHTML = "";
-            if (p.images.length > 1) p.images.forEach(url => gallery.innerHTML += `<img src="${url}" class="thumb" onclick="document.getElementById('modal-img-main').src='${url}'">`);
-            document.getElementById('modal-title').innerText = p.nombre; document.getElementById('modal-price').innerText = "$ " + p.precio.toLocaleString('es-AR'); document.getElementById('modal-category').innerText = p.categoria; document.getElementById('modal-desc').innerText = p.descripcion || "Sin descripción.";
-            const tallesContainer = document.getElementById('modal-talles'); tallesContainer.innerHTML = "";
-            if(p.talles && p.talles.length > 0) p.talles.forEach(t => tallesContainer.innerHTML += `<button class="size-btn" onclick="selectSize(this, '${t}')">${t}</button>`);
-            else { tallesContainer.innerHTML = "<span style='color:#999; font-size:0.9rem;'>Talle único</span>"; selectedSize = "Único"; }
-            document.getElementById('modal-add-btn').onclick = function() { addToCart(p.id, p.nombre, p.precio, p.images[0], p.talles); };
-            document.getElementById('product-modal').style.display = 'flex';
-        }
-        function selectSize(btn, talle) { document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedSize = talle; }
-        function addToCart(id, n, p, f, tallesDisponibles) {
-            if (!auth.currentUser) { alert("🔒 Ingresa para comprar"); openAuth(); return; }
-            if (tallesDisponibles && tallesDisponibles.length > 0 && !selectedSize) return alert("⚠️ Por favor selecciona un TALLE antes de agregar.");
-            let talleFinal = selectedSize || "Único";
-            let item = cart.find(i => i.id === id && i.size === talleFinal);
-            if(item) item.qty++; else cart.push({id, n, p, f, qty: 1, size: talleFinal});
-            saveCartToFirestore(cart);
-            if(!document.getElementById('cart-sidebar').classList.contains('open')) toggleCart();
-            closeModal('product-modal');
-        }
-        function saveCartToFirestore(newCart) { const user = auth.currentUser; if (user) db.collection('carts').doc(user.uid).set({ items: newCart }); }
-        function changeQty(id, size, delta) {
-            let item = cart.find(i => i.id === id && i.size === size); if(!item) return;
-            item.qty += delta; if(item.qty <= 0) cart = cart.filter(x => !(x.id === id && x.size === size));
-            saveCartToFirestore(cart);
-        }
-        function removeFromCart(id, size){ cart = cart.filter(x => !(x.id === id && x.size === size)); saveCartToFirestore(cart); }
-        
-        // --- LOGICA UI CARRITO ACTUALIZADA (Subtotal, Envío, Total) ---
-        function renderCartUI() {
-            let subtotal = 0, count = 0; const list = document.getElementById('cart-items-list'); list.innerHTML = "";
-            cart.forEach(i => {
-                subtotal += i.p * i.qty; count += i.qty;
-                list.innerHTML += `<div class="cart-item"><img src="${i.f}"><div style="flex:1;"><div style="font-weight:bold; font-size:0.9rem;">${i.n}</div><div style="font-size:0.8rem; color:#666;">Talle: ${i.size}</div><div style="color:var(--accent); font-weight:bold;">$ ${(i.p * i.qty).toLocaleString('es-AR')}</div><div class="qty-controls"><button class="qty-btn" onclick="changeQty('${i.id}', '${i.size}', -1)">-</button><span style="font-weight:bold; min-width:20px; text-align:center; font-size:0.9rem;">${i.qty}</span><button class="qty-btn" onclick="changeQty('${i.id}', '${i.size}', 1)">+</button></div></div><button class="btn-remove-item" onclick="removeFromCart('${i.id}', '${i.size}')" style="border:none; background:white; font-size:1.2rem; cursor:pointer;">✕</button></div>`;
-            });
-            
-            // Calculo Envío y Total
-            let envio = subtotal * 0.10; // 10% del subtotal
-            let total = subtotal + envio;
-
-            document.getElementById('cart-subtotal').innerText = "$ " + subtotal.toLocaleString('es-AR');
-            document.getElementById('cart-envio').innerText = "$ " + envio.toLocaleString('es-AR');
-            document.getElementById('cart-total').innerText = "$ " + total.toLocaleString('es-AR');
-            document.getElementById('cart-count').innerText = count;
-        }
-
-        // --- RENDERIZADO PRINCIPAL ---
-        db.collection("productos").onSnapshot((querySnapshot) => {
-            allProducts = [];
-            querySnapshot.forEach((doc) => {
-                let d = doc.data(); d.id = doc.id;
-                if(!d.publico) d.publico = 'adultos'; if(!d.categoria) d.categoria = 'todos'; if(!d.fotos) d.fotos = [d.foto || 'https://via.placeholder.com/300'];
-                d.images = Array.isArray(d.fotos) ? d.fotos : [d.foto];
-                allProducts.push(d);
-            });
-            if(document.getElementById('view-collection').classList.contains('active')) renderProducts();
-        });
-        function renderProducts() {
-            const list = document.getElementById('product-list'); list.innerHTML = "";
-            let filtered = allProducts;
-            if(currentAudience !== 'todos') filtered = filtered.filter(p => p.publico === currentAudience);
-            if(currentCategory !== 'todos') filtered = filtered.filter(p => p.categoria === currentCategory);
-            const isAdmin = auth.currentUser && auth.currentUser.email === ADMIN_EMAIL;
-            if(filtered.length===0) { list.innerHTML="<p>No hay productos.</p>"; return; }
-            filtered.forEach(p => {
-                let adminBtns = isAdmin ? `<div class="admin-actions"><button class="btn-round-action btn-edit" onclick="abrirEditor(event, '${p.id}')">✏️</button><button class="btn-round-action btn-delete" onclick="borrarProd(event, '${p.id}')">🗑️</button></div>` : '';
-                list.innerHTML += `<div class="product-card">${adminBtns}<div class="card-img-container" onclick="openProductModal('${p.id}')"><img src="${p.images[0]}" class="product-image"><div class="zoom-hint">Ver Detalle</div></div><div class="product-info"><div><small style="color:#888;">${p.categoria.toUpperCase()}</small><h3 class="product-title">${p.nombre}</h3><div class="product-price">$${p.precio.toLocaleString('es-AR')}</div></div><button class="btn" style="align-self:flex-start; margin-top:10px; padding: 5px 15px; font-size:0.8rem;" onclick="openProductModal('${p.id}')">+ Agregar</button></div></div>`;
-            });
-        }
-
-        // --- UTILS VISTAS ---
-        function switchView(v, aud = null) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + v).classList.add('active'); document.getElementById('nav-' + v).classList.add('active');
-            if(v === 'collection') { if (aud) switchAudience(aud); else renderProducts(); }
-            window.scrollTo(0,0);
-        }
-        function switchAudience(aud) {
-            currentAudience = aud; document.querySelectorAll('.aud-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('btn-' + aud).classList.add('active');
-            document.getElementById('collection-title').innerText = aud === 'todos' ? 'Colección Completa' : "Colección " + aud.charAt(0).toUpperCase() + aud.slice(1);
-            renderProducts();
-        }
-        function filterCategory(cat, btn) {
-            currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            if(btn) btn.classList.add('active'); renderProducts();
-        }
-        function toggleCart(){ 
-            const sidebar = document.getElementById('cart-sidebar');
-            if (!sidebar.classList.contains('open') && !auth.currentUser) { openAuth(); return; }
-            sidebar.classList.toggle('open'); 
-        }
-
-        // --- CHECKOUT INSTAGRAM ---
-        function finalizarPedidoInstagram(){
-            if(cart.length === 0) return alert("Carrito vacío");
-            
-            // 1. Construir el mensaje
-            let msg = "Hola DIVA! Quiero realizar el siguiente pedido:\n\n";
-            let subtotal = 0;
-            
-            cart.forEach(i => {
-                let itemTotal = i.p * i.qty;
-                subtotal += itemTotal;
-                msg += `• (${i.qty}) ${i.n} [Talle: ${i.size}] - $${itemTotal.toLocaleString('es-AR')}\n`;
-            });
-
-            let envio = subtotal * 0.10;
-            let total = subtotal + envio;
-
-            msg += `\n------------------\n`;
-            msg += `Subtotal: $${subtotal.toLocaleString('es-AR')}\n`;
-            msg += `Envío (10%): $${envio.toLocaleString('es-AR')}\n`;
-            msg += `TOTAL FINAL: $${total.toLocaleString('es-AR')}\n`;
-            msg += `\nMis datos: (Completar aquí)`;
-
-            // 2. Copiar al portapapeles y abrir Instagram
-            // Instagram no permite pre-rellenar el mensaje por URL como WhatsApp, así que usamos copiar/pegar.
-            navigator.clipboard.writeText(msg).then(() => {
-                alert("✅ ¡Pedido copiado al portapapeles!\n\nSe abrirá Instagram. Por favor, PEGA el mensaje en nuestro chat para finalizar la compra.");
-                // Reemplaza 'divamoda' con tu usuario real
-                window.open("https://ig.me/m/divamoda"); 
-            }).catch(err => {
-                console.error("Error al copiar", err);
-                alert("No pudimos copiar el pedido automáticamente. Por favor toma una captura.");
-                window.open("https://ig.me/m/divamoda");
-            });
-        }
-
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        window.onclick = function(e) { if(e.target.classList.contains('modal-overlay')) e.target.style.display='none'; }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
