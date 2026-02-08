@@ -1,20 +1,21 @@
 // --- CONFIGURACIÓN FIREBASE (COMPLETAR AQUÍ) ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyCoFktFXJSr73W58NMbAG-oIqgODhx25Jw",
-            authDomain: "diva-e8e3f.firebaseapp.com",
-            projectId: "diva-e8e3f",
-            storageBucket: "diva-e8e3f.firebasestorage.app",
-            messagingSenderId: "467138288300",
-            appId: "1:467138288300:web:e9108f47987364a75ddd09",
-            measurementId: "G-00MVBM27C2"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+const firebaseConfig = {
+    apiKey: "AIzaSyCoFktFXJSr73W58NMbAG-oIqgODhx25Jw",
+    authDomain: "diva-e8e3f.firebaseapp.com",
+    projectId: "diva-e8e3f",
+    storageBucket: "diva-e8e3f.firebasestorage.app",
+    messagingSenderId: "467138288300",
+    appId: "1:467138288300:web:e9108f47987364a75ddd09",
+    measurementId: "G-00MVBM27C2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
 
 // --- CONSTANTES Y VARIABLES ---
 const ADMIN_EMAIL = "pepito@gmail.com"; 
+const INSTAGRAM_USER = "diva_rosario1167"; // <--- CAMBIAR POR TU USUARIO REAL (SIN ARROBA)
 
 let currentAudience = 'todos';
 let currentCategory = 'todos';
@@ -22,6 +23,7 @@ let allProducts = [];
 let cart = [];
 let cartUnsubscribe = null;
 let selectedSize = null; 
+let deliveryOption = 'retiro'; // 'retiro' o 'envio'
 
 // --- LÓGICA DEL CARRUSEL DE BANNERS ---
 let heroImages = [
@@ -35,7 +37,6 @@ function startHeroCarousel() {
     if(!container) return;
     container.innerHTML = "";
     
-    // Crear elementos img
     heroImages.forEach((url, index) => {
         const img = document.createElement('img');
         img.src = url;
@@ -44,7 +45,6 @@ function startHeroCarousel() {
         container.appendChild(img);
     });
 
-    // Iniciar intervalo
     if(slideInterval) clearInterval(slideInterval);
     currentSlide = 0;
     
@@ -59,36 +59,29 @@ function startHeroCarousel() {
     }
 }
 
-// Cargar Configuración del Banner desde Firestore
 db.collection('settings').doc('hero').onSnapshot(doc => {
     if(doc.exists && doc.data().images && doc.data().images.length > 0) {
         heroImages = doc.data().images;
     }
     const bannerInput = document.getElementById('banner-urls');
     if(bannerInput) bannerInput.value = heroImages.join(', ');
-
     startHeroCarousel();
 });
 
-// Guardar Configuración del Banner (Admin)
 function saveBannerConfig() {
     const raw = document.getElementById('banner-urls').value;
     if(!raw) return alert("Ingresa al menos una URL");
     const urls = raw.split(',').map(u => u.trim()).filter(u => u.length > 0);
-    
     db.collection('settings').doc('hero').set({ images: urls })
         .then(() => alert("Banner actualizado!"))
         .catch(e => alert("Error: " + e.message));
 }
 
-// --- NUEVO: CARGAR Y GUARDAR DATA FISCAL (FOOTER) ---
+// --- DATA FISCAL ---
 db.collection('settings').doc('data_fiscal').onSnapshot(doc => {
     if(doc.exists && doc.data().url) {
-        // Actualizar imagen en el footer
         const imgFooter = document.getElementById('footer-afip-img');
         if(imgFooter) imgFooter.src = doc.data().url;
-
-        // Actualizar input del admin si existe
         const inputAdmin = document.getElementById('data-fiscal-url');
         if(inputAdmin) inputAdmin.value = doc.data().url;
     }
@@ -97,13 +90,12 @@ db.collection('settings').doc('data_fiscal').onSnapshot(doc => {
 function saveDataFiscalConfig() {
     const url = document.getElementById('data-fiscal-url').value.trim();
     if(!url) return alert("Ingresa la URL de la imagen");
-    
     db.collection('settings').doc('data_fiscal').set({ url: url })
         .then(() => alert("Imagen Data Fiscal actualizada!"))
         .catch(e => alert("Error: " + e.message));
 }
 
-// --- AUTH: ESTADO Y LOGICA UI ---
+// --- AUTH ---
 auth.onAuthStateChanged(user => {
     const btnLogin = document.getElementById('btn-login-trigger');
     const userDisplay = document.getElementById('user-display');
@@ -130,25 +122,21 @@ auth.onAuthStateChanged(user => {
     if(document.getElementById('view-collection').classList.contains('active')) renderProducts();
 });
 
-// --- FUNCIONES DE AUTH ---
 function openAuth() { toggleAuthView('login'); document.getElementById('auth-modal').style.display = 'flex'; }
-
 function toggleAuthView(view) {
     document.getElementById('view-login-form').classList.remove('active');
     document.getElementById('view-register-form').classList.remove('active');
     document.getElementById('view-forgot-pass').classList.remove('active');
-
     if(view === 'login') document.getElementById('view-login-form').classList.add('active');
     else if(view === 'register') document.getElementById('view-register-form').classList.add('active');
     else if(view === 'forgot') document.getElementById('view-forgot-pass').classList.add('active');
 }
-
 function togglePass(id) {
     const input = document.getElementById(id);
     if (input.type === "password") input.type = "text"; else input.type = "password";
 }
 
-// --- REGISTRO CON VALIDACIONES REGEX ---
+// --- REGISTRO Y LOGIN ---
 function registerUser() { 
     const dni = document.getElementById('reg-dni').value.trim();
     const nombre = document.getElementById('reg-nombre').value.trim();
@@ -158,17 +146,13 @@ function registerUser() {
     const pass = document.getElementById('reg-pass').value;
     const passConf = document.getElementById('reg-pass-conf').value;
 
-    // VALIDACIONES REGEX
     const regexDNI = /^\d{8}$/;
     if (!regexDNI.test(dni)) return alert("⚠️ Error en DNI: Debe contener exactamente 8 números.");
-
     const regexNombres = /^[a-zA-ZÀ-ÿ\s]+$/;
     if (!regexNombres.test(nombre)) return alert("⚠️ Error en Nombre: Solo letras.");
     if (!regexNombres.test(apellido)) return alert("⚠️ Error en Apellido: Solo letras.");
-
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regexEmail.test(email)) return alert("⚠️ Error: Email inválido.");
-
     const regexCel = /^\d{10}$/;
     if (!regexCel.test(celular)) return alert("⚠️ Error en Celular: Deben ser 10 números (Cód. Área + Nro).");
 
@@ -195,67 +179,52 @@ function loginUser(){
     auth.signInWithEmailAndPassword(e, p).then(() => closeModal('auth-modal')).catch((error) => alert("Error de credenciales."));
 }
 
-// --- RECUPERACIÓN (SOLUCIÓN A ERROR DE ÍNDICE) ---
 function validateAndRecover() {
     const email = document.getElementById('rec-email').value.trim();
     const dni = document.getElementById('rec-dni').value.trim();
     const celular = document.getElementById('rec-celular').value.trim();
-
     if(!email || !dni || !celular) return alert("Completá todos los campos.");
 
-    // BUSCAMOS SOLO POR EMAIL PARA EVITAR ERROR DE INDICE EN FIREBASE
     db.collection('users').where('email', '==', email).get()
         .then(querySnapshot => {
-            if (querySnapshot.empty) {
-                return alert("❌ Email no registrado.");
-            }
-            
+            if (querySnapshot.empty) return alert("❌ Email no registrado.");
             let usuarioEncontrado = false;
             querySnapshot.forEach(doc => {
                 const data = doc.data();
-                if(data.dni === dni && data.celular === celular) {
-                    usuarioEncontrado = true;
-                }
+                if(data.dni === dni && data.celular === celular) usuarioEncontrado = true;
             });
-
             if (usuarioEncontrado) {
                 auth.sendPasswordResetEmail(email)
-                    .then(() => {
-                        alert("✅ Datos Validados. Revisa tu correo (y Spam) para restaurar la contraseña.");
-                        toggleAuthView('login');
-                    })
-                    .catch((e) => alert("Error enviando mail: " + e.message));
-            } else {
-                alert("❌ Los datos (DNI/Celular) no coinciden con este Email.");
-            }
+                    .then(() => { alert("✅ Datos Validados. Revisa tu correo."); toggleAuthView('login'); })
+                    .catch((e) => alert("Error: " + e.message));
+            } else { alert("❌ Los datos no coinciden."); }
         })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Error de conexión o validación.");
-        });
+        .catch(error => alert("Error de conexión."));
 }
 
 function logoutUser(){ auth.signOut(); }
 
-// --- LOGICA DE PRODUCTOS (CRUD) ---
+// --- PRODUCTOS CRUD ---
 function agregarProducto() {
     if(!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) return alert("Solo admin.");
     const n = document.getElementById('nuevo-nombre').value, p = parseFloat(document.getElementById('nuevo-precio').value), desc = document.getElementById('nuevo-desc').value;
-    const checkboxes = document.querySelectorAll('input[name="nuevo-talle"]:checked');
-    const talles = Array.from(checkboxes).map(cb => cb.value);
+    const talles = Array.from(document.querySelectorAll('input[name="nuevo-talle"]:checked')).map(cb => cb.value);
     const f1 = document.getElementById('foto1').value, f2 = document.getElementById('foto2').value, f3 = document.getElementById('foto3').value;
     let fotos = [f1]; if(f2) fotos.push(f2); if(f3) fotos.push(f3);
     const c = document.getElementById('nueva-categoria').value, pub = document.getElementById('nuevo-publico').value;
     if(!n || !p || !f1) return alert("Faltan datos");
     db.collection("productos").add({nombre: n, precio: p, descripcion: desc, talles: talles, foto: f1, fotos: fotos, categoria: c, publico: pub, fecha: new Date()}).then(() => alert("Publicado!")).catch(e => alert(e.message));
 }
+
 function abrirEditor(event, id) {
     event.stopPropagation();
     const p = allProducts.find(item => item.id === id); if (!p) return;
-    document.getElementById('edit-id').value = p.id; document.getElementById('edit-nombre').value = p.nombre; document.getElementById('edit-precio').value = p.precio; document.getElementById('edit-desc').value = p.descripcion || ''; document.getElementById('edit-publico').value = p.publico; document.getElementById('edit-categoria').value = p.categoria; document.getElementById('edit-foto1').value = p.images[0] || ''; document.getElementById('edit-foto2').value = p.images[1] || ''; document.getElementById('edit-foto3').value = p.images[2] || '';
+    document.getElementById('edit-id').value = p.id; document.getElementById('edit-nombre').value = p.nombre; document.getElementById('edit-precio').value = p.precio; document.getElementById('edit-desc').value = p.descripcion || ''; document.getElementById('edit-publico').value = p.publico; document.getElementById('edit-categoria').value = p.categoria; 
+    document.getElementById('edit-foto1').value = p.images[0] || ''; document.getElementById('edit-foto2').value = p.images[1] || ''; document.getElementById('edit-foto3').value = p.images[2] || '';
     document.querySelectorAll('input[name="edit-talle"]').forEach(cb => cb.checked = p.talles && p.talles.includes(cb.value));
     document.getElementById('edit-modal').style.display = 'flex';
 }
+
 function guardarEdicion() {
     if(!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) return alert("Sin permisos");
     const id = document.getElementById('edit-id').value, n = document.getElementById('edit-nombre').value, p = parseFloat(document.getElementById('edit-precio').value), desc = document.getElementById('edit-desc').value;
@@ -264,9 +233,10 @@ function guardarEdicion() {
     let fotos = []; if(f1) fotos.push(f1); if(f2) fotos.push(f2); if(f3) fotos.push(f3);
     db.collection("productos").doc(id).update({nombre: n, precio: p, descripcion: desc, talles: talles, fotos: fotos, foto: fotos[0], publico: document.getElementById('edit-publico').value, categoria: document.getElementById('edit-categoria').value}).then(() => { alert("Actualizado"); closeModal('edit-modal'); });
 }
+
 function borrarProd(event, id) { event.stopPropagation(); if(confirm("¿Eliminar?")) db.collection("productos").doc(id).delete(); }
 
-// --- UI DETALLES Y CARRITO ---
+// --- CARRITO ---
 function openProductModal(id) {
     const p = allProducts.find(x => x.id === id); if(!p) return;
     selectedSize = null;
@@ -283,7 +253,7 @@ function openProductModal(id) {
 function selectSize(btn, talle) { document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedSize = talle; }
 function addToCart(id, n, p, f, tallesDisponibles) {
     if (!auth.currentUser) { alert("🔒 Ingresa para comprar"); openAuth(); return; }
-    if (tallesDisponibles && tallesDisponibles.length > 0 && !selectedSize) return alert("⚠️ Por favor selecciona un TALLE antes de agregar.");
+    if (tallesDisponibles && tallesDisponibles.length > 0 && !selectedSize) return alert("⚠️ Selecciona un TALLE.");
     let talleFinal = selectedSize || "Único";
     let item = cart.find(i => i.id === id && i.size === talleFinal);
     if(item) item.qty++; else cart.push({id, n, p, f, qty: 1, size: talleFinal});
@@ -307,7 +277,53 @@ function renderCartUI() {
     document.getElementById('cart-total').innerText = "$ " + total.toLocaleString('es-AR'); document.getElementById('cart-count').innerText = count;
 }
 
-// --- RENDERIZADO PRINCIPAL ---
+// --- LOGICA ENVIO E INSTAGRAM ---
+function setDeliveryOption(option) {
+    deliveryOption = option;
+    document.getElementById('opt-retiro').classList.remove('selected');
+    document.getElementById('opt-envio').classList.remove('selected');
+    document.getElementById('opt-' + option).classList.add('selected');
+    const msgEnvio = document.getElementById('shipping-notice');
+    msgEnvio.style.display = (option === 'envio') ? 'block' : 'none';
+}
+
+function finalizarCompraInstagram() {
+    if(cart.length === 0) return alert("El carrito está vacío.");
+
+    let total = 0;
+    cart.forEach(i => total += i.p * i.qty);
+
+    let msg = `Hola! Quiero realizar el siguiente pedido:\n\n`;
+    cart.forEach(i=> {
+        msg += `• (${i.qty}) ${i.n} [Talle: ${i.size}] - $${(i.p * i.qty).toLocaleString('es-AR')}\n`;
+    });
+    msg += `\n----------------\n`;
+    msg += `Subtotal Productos: $${total.toLocaleString('es-AR')}\n`;
+    msg += (deliveryOption === 'envio') ? `Modo de Entrega: ENVÍO A DOMICILIO 🚚\n(El costo del envío lo coordinamos por aquí)` : `Modo de Entrega: RETIRO EN LOCAL 🛍️\n`;
+
+    // COPIAR Y ABRIR
+    navigator.clipboard.writeText(msg).then(() => {
+        // Alerta con instrucciones precisas para el usuario
+        alert("✅ ¡PEDIDO COPIADO!\n\nSe abrirá el chat de Instagram.\n\n👉 Solo tenés que mantener presionado, PEGAR el pedido copiado y enviarlo!");
+        
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        let url = "";
+
+        if (isMobile) {
+            // Intenta abrir la app directamente en el chat
+            url = `instagram://direct_message?username=${INSTAGRAM_USER}`;
+        } else {
+            // Versión web
+            url = `https://ig.me/m/${INSTAGRAM_USER}`;
+        }
+        window.open(url, '_blank');
+    }).catch(err => {
+        alert("No se pudo copiar el pedido automáticamente. Por favor hacé captura.");
+        console.error('Error al copiar: ', err);
+    });
+}
+
+// --- RENDERIZADO ---
 db.collection("productos").onSnapshot((querySnapshot) => {
     allProducts = [];
     querySnapshot.forEach((doc) => {
@@ -331,7 +347,6 @@ function renderProducts() {
     });
 }
 
-// --- UTILS VISTAS ---
 function switchView(v, aud = null) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
@@ -353,13 +368,6 @@ function toggleCart(){
     const sidebar = document.getElementById('cart-sidebar');
     if (!sidebar.classList.contains('open') && !auth.currentUser) { openAuth(); return; }
     sidebar.classList.toggle('open'); 
-}
-function irAlWhatsapp(){
-    if(cart.length===0) return alert("Carrito vacío");
-    let msg = "Hola! Quiero pedir:\n\n";
-    cart.forEach(i=> msg += `• (${i.qty}) ${i.n} [Talle: ${i.size}] - $${(i.p*i.qty).toLocaleString('es-AR')}\n`);
-    msg += `\nTotal: ${document.getElementById('cart-total').innerText}`;
-    window.open("https://wa.me/5491100000000?text="+encodeURIComponent(msg));
 }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 window.onclick = function(e) { if(e.target.classList.contains('modal-overlay')) e.target.style.display='none'; }
