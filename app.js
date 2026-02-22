@@ -79,20 +79,25 @@ function saveBannerConfig() {
 
 // --- DATA FISCAL ---
 db.collection('settings').doc('data_fiscal').onSnapshot(doc => {
-    if(doc.exists && doc.data().url) {
-        const imgFooter = document.getElementById('footer-afip-img');
-        if(imgFooter) imgFooter.src = doc.data().url;
-        const inputAdmin = document.getElementById('data-fiscal-url');
-        if(inputAdmin) inputAdmin.value = doc.data().url;
+    if(doc.exists && doc.data().code) {
+        // En lugar de una imagen, buscamos el contenedor div
+        const containerFooter = document.getElementById('footer-afip-container');
+        if(containerFooter) containerFooter.innerHTML = doc.data().code;
+        
+        // Rellenamos el textarea del administrador
+        const inputAdmin = document.getElementById('data-fiscal-code');
+        if(inputAdmin) inputAdmin.value = doc.data().code;
     }
-    <a href="http://qr.afip.gob.ar/?qr=Vl6kXBCtXjZGZ8relrViWw,," target="_F960AFIPInfo"><img src="http://www.afip.gob.ar/images/f960/DATAWEB.jpg" border="0"></a>
 });
 
 function saveDataFiscalConfig() {
-    const url = document.getElementById('data-fiscal-url').value.trim();
-    if(!url) return alert("Ingresa la URL de la imagen");
-    db.collection('settings').doc('data_fiscal').set({ url: url })
-        .then(() => alert("Imagen Data Fiscal actualizada!"))
+    // Tomamos el código HTML completo
+    const code = document.getElementById('data-fiscal-code').value.trim();
+    if(!code) return alert("Ingresa el código HTML de AFIP");
+    
+    // Lo guardamos en Firestore como 'code'
+    db.collection('settings').doc('data_fiscal').set({ code: code })
+        .then(() => alert("¡Código Data Fiscal actualizado!"))
         .catch(e => alert("Error: " + e.message));
 }
 

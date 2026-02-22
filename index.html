@@ -158,8 +158,8 @@
             <div class="admin-section-title">📄 Data Fiscal (Footer)</div>
             <div class="admin-controls">
                 <div style="grid-column: 1 / -1;">
-                    <label style="display:block; margin-bottom:5px; font-size:0.9rem;">URL de la Imagen Data Fiscal:</label>
-                    <input type="text" id="data-fiscal-url" class="admin-input" placeholder="https://www.afip.gob.ar/images/f960/DATAWEB.jpg">
+                    <label style="display:block; margin-bottom:5px; font-size:0.9rem;">Código HTML de Data Fiscal (AFIP):</label>
+                    <textarea id="data-fiscal-code" class="admin-textarea" placeholder='Pegá acá el código exacto de AFIP (Ej: <a href="http://qr.afip.gob.ar..." target="_F960AFIPInfo"><img src="..."></a>)'></textarea>
                     <button onclick="saveDataFiscalConfig()" class="btn" style="margin-top:10px;">Guardar Data Fiscal</button>
                 </div>
             </div>
@@ -199,8 +199,8 @@
                 <h4>HORARIOS DE ATENCIÓN</h4>
                 <p>LUNES A SÁBADO DE 9:30 A 18:30HS</p>
             </div>
-            <div class="footer-data-fiscal">
-                <img id="footer-afip-img" src="https://www.afip.gob.ar/images/f960/DATAWEB.jpg" alt="Data Fiscal">
+            <div class="footer-data-fiscal" id="footer-afip-container">
+                <img src="https://www.afip.gob.ar/images/f960/DATAWEB.jpg" alt="Data Fiscal">
             </div>
         </div>
         <div class="footer-copyright">
