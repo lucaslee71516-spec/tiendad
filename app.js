@@ -210,6 +210,28 @@ function validateAndRecover() {
 
 function logoutUser(){ auth.signOut(); }
 
+// --- LÓGICA DE TALLES DINÁMICOS ---
+const tallesAdultos = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const tallesInfantiles = ['6', '8', '10', '12', '14', '16'];
+
+function actualizarTalles(selectId, containerId, checkboxName, tallesSeleccionados = []) {
+    const publico = document.getElementById(selectId).value;
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const talles = (publico === 'infantiles') ? tallesInfantiles : tallesAdultos;
+    container.innerHTML = ""; // Limpiamos los anteriores
+    
+    talles.forEach(t => {
+        const checked = tallesSeleccionados.includes(t) ? "checked" : "";
+        container.innerHTML += `<div class="talle-checkbox"><label><input type="checkbox" name="${checkboxName}" value="${t}" ${checked}> ${t}</label></div>`;
+    });
+}
+
+// Para que al cargar la página ya se vean los talles de "Adultos" en "Agregar Producto"
+setTimeout(() => { if(document.getElementById('nuevo-publico')) actualizarTalles('nuevo-publico', 'talles-nuevo-container', 'nuevo-talle'); }, 500);
+
+
 // --- PRODUCTOS CRUD ---
 function agregarProducto() {
     if(!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) return alert("Solo admin.");
@@ -225,9 +247,19 @@ function agregarProducto() {
 function abrirEditor(event, id) {
     event.stopPropagation();
     const p = allProducts.find(item => item.id === id); if (!p) return;
-    document.getElementById('edit-id').value = p.id; document.getElementById('edit-nombre').value = p.nombre; document.getElementById('edit-precio').value = p.precio; document.getElementById('edit-desc').value = p.descripcion || ''; document.getElementById('edit-publico').value = p.publico; document.getElementById('edit-categoria').value = p.categoria; 
-    document.getElementById('edit-foto1').value = p.images[0] || ''; document.getElementById('edit-foto2').value = p.images[1] || ''; document.getElementById('edit-foto3').value = p.images[2] || '';
-    document.querySelectorAll('input[name="edit-talle"]').forEach(cb => cb.checked = p.talles && p.talles.includes(cb.value));
+    document.getElementById('edit-id').value = p.id; 
+    document.getElementById('edit-nombre').value = p.nombre; 
+    document.getElementById('edit-precio').value = p.precio; 
+    document.getElementById('edit-desc').value = p.descripcion || ''; 
+    document.getElementById('edit-publico').value = p.publico; 
+    document.getElementById('edit-categoria').value = p.categoria; 
+    document.getElementById('edit-foto1').value = p.images[0] || ''; 
+    document.getElementById('edit-foto2').value = p.images[1] || ''; 
+    document.getElementById('edit-foto3').value = p.images[2] || '';
+    
+    // Acá inyectamos los talles correctos (adultos o infantiles) y marcamos los que el producto ya tiene
+    actualizarTalles('edit-publico', 'talles-edit-container', 'edit-talle', p.talles || []);
+    
     document.getElementById('edit-modal').style.display = 'flex';
 }
 

@@ -78,9 +78,16 @@
             <div class="edit-form-grid">
                 <div><label>Nombre</label><input type="text" id="edit-nombre" class="admin-input"></div>
                 <div><label>Precio</label><input type="text" id="edit-precio" class="admin-input"></div>
-                <div><label>Talles Disponibles</label><div class="talles-selector" style="background:white; border:1px solid #ddd; color: #333;"><div class="talle-checkbox"><label><input type="checkbox" name="edit-talle" value="XS"> XS</label></div><div class="talle-checkbox"><label><input type="checkbox" name="edit-talle" value="S"> S</label></div><div class="talle-checkbox"><label><input type="checkbox" name="edit-talle" value="M"> M</label></div><div class="talle-checkbox"><label><input type="checkbox" name="edit-talle" value="L"> L</label></div><div class="talle-checkbox"><label><input type="checkbox" name="edit-talle" value="XL"> XL</label></div><div class="talle-checkbox"><label><input type="checkbox" name="edit-talle" value="XXL"> XXL</label></div></div></div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>Público</label><select id="edit-publico" class="admin-input" onchange="actualizarTalles('edit-publico', 'talles-edit-container', 'edit-talle')"><option value="adultos">Adultos</option><option value="infantiles">Infantiles</option></select></div>
+                    <div><label>Categoría</label><select id="edit-categoria" class="admin-input"><option value="remeras">Remeras</option><option value="pantalones">Pantalones</option><option value="abrigos">Abrigos</option><option value="calzado">Calzado</option></select></div>
+                </div>
+
+                <div><label>Talles Disponibles</label><div class="talles-selector" id="talles-edit-container" style="background:white; border:1px solid #ddd; color: #333;"></div></div>
+                
                 <div><label>Descripción</label><textarea id="edit-desc" class="admin-input" style="height:100px; font-family:inherit;"></textarea></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><label>Público</label><select id="edit-publico" class="admin-input"><option value="adultos">Adultos</option><option value="infantiles">Infantiles</option></select></div><div><label>Categoría</label><select id="edit-categoria" class="admin-input"><option value="remeras">Remeras</option><option value="pantalones">Pantalones</option><option value="abrigos">Abrigos</option><option value="calzado">Calzado</option></select></div></div>
+                
                 <div><label>Foto 1 (URL)</label><input type="text" id="edit-foto1" class="admin-input"></div><div><label>Foto 2 (URL)</label><input type="text" id="edit-foto2" class="admin-input"></div><div><label>Foto 3 (URL)</label><input type="text" id="edit-foto3" class="admin-input"></div>
                 <button class="btn" onclick="guardarEdicion()">GUARDAR CAMBIOS</button>
             </div>
@@ -136,9 +143,21 @@
         <div id="admin-panel">
             <h3 style="margin-top:0; border-bottom:1px solid #555; padding-bottom:10px;">🔧 Administrador - Agregar Producto</h3>
             <div class="admin-controls">
-                <div><input type="text" id="nuevo-nombre" class="admin-input" placeholder="Nombre"></div>
                 <div><input type="text" id="nuevo-precio" class="admin-input" placeholder="Precio"></div>
-                <div class="talles-selector"><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="XS"> XS</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="S"> S</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="M"> M</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="L"> L</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="XL"> XL</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="XXL"> XXL</label></div></div>
+                
+                <div><select id="nuevo-publico" class="admin-input" onchange="actualizarTalles('nuevo-publico', 'talles-nuevo-container', 'nuevo-talle')">
+                    <option value="adultos">Adultos</option>
+                    <option value="infantiles">Infantiles</option>
+                </select></div>
+
+                <div><select id="nueva-categoria" class="admin-input">
+                    <option value="remeras">Remeras</option>
+                    <option value="pantalones">Pantalones</option>
+                    <option value="vestidos">Vestidos</option>
+                    <option value="conjuntos">Conjuntos</option>
+                </select></div>
+
+                <div class="talles-selector" id="talles-nuevo-container"></div>
                 <div><select id="nuevo-publico" class="admin-input"><option value="adultos">Adultos</option><option value="infantiles">Infantiles</option></select></div>
                 <div><select id="nueva-categoria" class="admin-input"><option value="remeras">Remeras</option><option value="pantalones">Pantalones</option><option value="abrigos">Vestidos</option><option value="calzado">Conjuntos</option></select></div>
                 <div><input type="text" id="foto1" class="admin-input" placeholder="Foto 1"></div><div><input type="text" id="foto2" class="admin-input" placeholder="Foto 2"></div><div><input type="text" id="foto3" class="admin-input" placeholder="Foto 3"></div>
