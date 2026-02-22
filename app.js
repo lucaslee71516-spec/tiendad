@@ -85,6 +85,7 @@ db.collection('settings').doc('data_fiscal').onSnapshot(doc => {
         const inputAdmin = document.getElementById('data-fiscal-url');
         if(inputAdmin) inputAdmin.value = doc.data().url;
     }
+    <a href="http://qr.afip.gob.ar/?qr=Vl6kXBCtXjZGZ8relrViWw,," target="_F960AFIPInfo"><img src="http://www.afip.gob.ar/images/f960/DATAWEB.jpg" border="0"></a>
 });
 
 function saveDataFiscalConfig() {
