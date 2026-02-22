@@ -143,6 +143,7 @@
         <div id="admin-panel">
             <h3 style="margin-top:0; border-bottom:1px solid #555; padding-bottom:10px;">🔧 Administrador - Agregar Producto</h3>
             <div class="admin-controls">
+                <div><input type="text" id="nuevo-nombre" class="admin-input" placeholder="Nombre"></div>
                 <div><input type="text" id="nuevo-precio" class="admin-input" placeholder="Precio"></div>
                 
                 <div><select id="nuevo-publico" class="admin-input" onchange="actualizarTalles('nuevo-publico', 'talles-nuevo-container', 'nuevo-talle'); actualizarCategoriasSelect('nuevo-publico', 'nueva-categoria');">
@@ -152,17 +153,12 @@
 
                 <div><select id="nueva-categoria" class="admin-input"></select></div>
 
-                <div><select id="nueva-categoria" class="admin-input">
-                    <option value="remeras">Remeras</option>
-                    <option value="pantalones">Pantalones</option>
-                    <option value="vestidos">Vestidos</option>
-                    <option value="conjuntos">Conjuntos</option>
-                </select></div>
-
-                <div class="talles-selector" id="talles-nuevo-container"></div>
-                <div><select id="nuevo-publico" class="admin-input"><option value="adultos">Adultos</option><option value="infantiles">Infantiles</option></select></div>
-                <div><select id="nueva-categoria" class="admin-input"><option value="remeras">Remeras</option><option value="pantalones">Pantalones</option><option value="abrigos">Vestidos</option><option value="calzado">Conjuntos</option></select></div>
-                <div><input type="text" id="foto1" class="admin-input" placeholder="Foto 1"></div><div><input type="text" id="foto2" class="admin-input" placeholder="Foto 2"></div><div><input type="text" id="foto3" class="admin-input" placeholder="Foto 3"></div>
+                <div class="talles-selector" id="talles-nuevo-container" style="background:white; border:1px solid #ddd; color: #333;"></div>
+                
+                <div><input type="text" id="foto1" class="admin-input" placeholder="Foto 1"></div>
+                <div><input type="text" id="foto2" class="admin-input" placeholder="Foto 2"></div>
+                <div><input type="text" id="foto3" class="admin-input" placeholder="Foto 3"></div>
+                
                 <div style="grid-column: 1 / -1;"><textarea id="nuevo-desc" class="admin-textarea" placeholder="Descripción..."></textarea></div>
                 <button onclick="agregarProducto()" class="btn" style="height:100%; grid-column: 1 / -1;">+ Publicar</button>
             </div>
