@@ -140,7 +140,7 @@
                 <div><input type="text" id="nuevo-precio" class="admin-input" placeholder="Precio"></div>
                 <div class="talles-selector"><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="XS"> XS</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="S"> S</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="M"> M</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="L"> L</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="XL"> XL</label></div><div class="talle-checkbox"><label><input type="checkbox" name="nuevo-talle" value="XXL"> XXL</label></div></div>
                 <div><select id="nuevo-publico" class="admin-input"><option value="adultos">Adultos</option><option value="infantiles">Infantiles</option></select></div>
-                <div><select id="nueva-categoria" class="admin-input"><option value="remeras">Remeras</option><option value="pantalones">Pantalones</option><option value="abrigos">Abrigos</option><option value="calzado">Calzado</option></select></div>
+                <div><select id="nueva-categoria" class="admin-input"><option value="remeras">Remeras</option><option value="pantalones">Pantalones</option><option value="abrigos">Vestidos</option><option value="calzado">Conjuntos</option></select></div>
                 <div><input type="text" id="foto1" class="admin-input" placeholder="Foto 1"></div><div><input type="text" id="foto2" class="admin-input" placeholder="Foto 2"></div><div><input type="text" id="foto3" class="admin-input" placeholder="Foto 3"></div>
                 <div style="grid-column: 1 / -1;"><textarea id="nuevo-desc" class="admin-textarea" placeholder="Descripción..."></textarea></div>
                 <button onclick="agregarProducto()" class="btn" style="height:100%; grid-column: 1 / -1;">+ Publicar</button>
@@ -174,8 +174,8 @@
             <button class="cat-btn active" onclick="filterCategory('todos', this)">Todo</button>
             <button class="cat-btn" onclick="filterCategory('remeras', this)">Remeras</button>
             <button class="cat-btn" onclick="filterCategory('pantalones', this)">Pantalones</button>
-            <button class="cat-btn" onclick="filterCategory('abrigos', this)">Abrigos</button>
-            <button class="cat-btn" onclick="filterCategory('calzado', this)">Calzado</button>
+            <button class="cat-btn" onclick="filterCategory('vestidos', this)">Vestidos</button>
+            <button class="cat-btn" onclick="filterCategory('conjuntos', this)">Conjuntos</button>
         </div>
         <div class="container">
             <h2 id="collection-title" style="text-align:center; margin-bottom:40px; text-transform:uppercase; font-size:1.5rem; letter-spacing:2px;">Colección Completa</h2>
