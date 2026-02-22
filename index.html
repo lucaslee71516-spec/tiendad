@@ -80,8 +80,8 @@
                 <div><label>Precio</label><input type="text" id="edit-precio" class="admin-input"></div>
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label>Público</label><select id="edit-publico" class="admin-input" onchange="actualizarTalles('edit-publico', 'talles-edit-container', 'edit-talle')"><option value="adultos">Adultos</option><option value="infantiles">Infantiles</option></select></div>
-                    <div><label>Categoría</label><select id="edit-categoria" class="admin-input"><option value="remeras">Remeras</option><option value="pantalones">Pantalones</option><option value="abrigos">Abrigos</option><option value="calzado">Calzado</option></select></div>
+                    <div><label>Público</label><select id="edit-publico" class="admin-input" onchange="actualizarTalles('edit-publico', 'talles-edit-container', 'edit-talle'); actualizarCategoriasSelect('edit-publico', 'edit-categoria');"><option value="adultos">Adultos</option><option value="infantiles">Infantiles</option></select></div>
+                    <div><label>Categoría</label><select id="edit-categoria" class="admin-input"></select></div>
                 </div>
 
                 <div><label>Talles Disponibles</label><div class="talles-selector" id="talles-edit-container" style="background:white; border:1px solid #ddd; color: #333;"></div></div>
@@ -145,10 +145,12 @@
             <div class="admin-controls">
                 <div><input type="text" id="nuevo-precio" class="admin-input" placeholder="Precio"></div>
                 
-                <div><select id="nuevo-publico" class="admin-input" onchange="actualizarTalles('nuevo-publico', 'talles-nuevo-container', 'nuevo-talle')">
+                <div><select id="nuevo-publico" class="admin-input" onchange="actualizarTalles('nuevo-publico', 'talles-nuevo-container', 'nuevo-talle'); actualizarCategoriasSelect('nuevo-publico', 'nueva-categoria');">
                     <option value="adultos">Adultos</option>
                     <option value="infantiles">Infantiles</option>
                 </select></div>
+
+                <div><select id="nueva-categoria" class="admin-input"></select></div>
 
                 <div><select id="nueva-categoria" class="admin-input">
                     <option value="remeras">Remeras</option>
@@ -189,13 +191,8 @@
             <button class="aud-btn" id="btn-adultos" onclick="switchAudience('adultos')">ADULTOS</button>
             <button class="aud-btn" id="btn-infantiles" onclick="switchAudience('infantiles')">INFANTILES</button>
         </div>
-        <div class="category-nav">
-            <button class="cat-btn active" onclick="filterCategory('todos', this)">Todo</button>
-            <button class="cat-btn" onclick="filterCategory('remeras', this)">Remeras</button>
-            <button class="cat-btn" onclick="filterCategory('pantalones', this)">Pantalones</button>
-            <button class="cat-btn" onclick="filterCategory('vestidos', this)">Vestidos</button>
-            <button class="cat-btn" onclick="filterCategory('conjuntos', this)">Conjuntos</button>
-        </div>
+        <div class="category-nav" id="dynamic-category-nav">
+            </div>
         <div class="container">
             <h2 id="collection-title" style="text-align:center; margin-bottom:40px; text-transform:uppercase; font-size:1.5rem; letter-spacing:2px;">Colección Completa</h2>
             <div class="product-grid" id="product-list"></div>

@@ -211,7 +211,7 @@ function validateAndRecover() {
 function logoutUser(){ auth.signOut(); }
 
 // --- LÓGICA DE TALLES DINÁMICOS ---
-const tallesAdultos = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const tallesAdultos = ['Único', 'XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const tallesInfantiles = ['6', '8', '10', '12', '14', '16'];
 
 function actualizarTalles(selectId, containerId, checkboxName, tallesSeleccionados = []) {
@@ -229,8 +229,55 @@ function actualizarTalles(selectId, containerId, checkboxName, tallesSeleccionad
 }
 
 // Para que al cargar la página ya se vean los talles de "Adultos" en "Agregar Producto"
-setTimeout(() => { if(document.getElementById('nuevo-publico')) actualizarTalles('nuevo-publico', 'talles-nuevo-container', 'nuevo-talle'); }, 500);
+// Inicializar la vista de administrador y categorías al cargar la web
+setTimeout(() => { 
+    if(document.getElementById('nuevo-publico')) {
+        actualizarTalles('nuevo-publico', 'talles-nuevo-container', 'nuevo-talle');
+        actualizarCategoriasSelect('nuevo-publico', 'nueva-categoria');
+    }
+    renderCategoryNav();
+}, 500);
 
+// --- LÓGICA DE CATEGORÍAS DINÁMICAS ---
+const categoriasComunes = ['remeras', 'pantalones', 'vestidos', 'conjuntos', 'polleras', 'camperas', 'accesorios'];
+const categoriasInfantilesSolo = ['mallas', 'disfraces'];
+
+function renderCategoryNav() {
+    const nav = document.getElementById('dynamic-category-nav');
+    if(!nav) return;
+    
+    // Armamos la lista de categorías a mostrar según el público actual
+    let cats = [...categoriasComunes];
+    if (currentAudience === 'infantiles' || currentAudience === 'todos') {
+        cats = cats.concat(categoriasInfantilesSolo);
+    }
+
+    let html = `<button class="cat-btn ${currentCategory === 'todos' ? 'active' : ''}" onclick="filterCategory('todos', this)">Todo</button>`;
+    cats.forEach(cat => {
+        const isActive = (currentCategory === cat) ? 'active' : '';
+        const nombreCat = cat.charAt(0).toUpperCase() + cat.slice(1);
+        html += `<button class="cat-btn ${isActive}" onclick="filterCategory('${cat}', this)">${nombreCat}</button>`;
+    });
+    nav.innerHTML = html;
+}
+
+function actualizarCategoriasSelect(selectPublicoId, selectCategoriaId, categoriaElegida = '') {
+    const publico = document.getElementById(selectPublicoId).value;
+    const selectCat = document.getElementById(selectCategoriaId);
+    if (!selectCat) return;
+
+    let opciones = [...categoriasComunes];
+    if (publico === 'infantiles') {
+        opciones = opciones.concat(categoriasInfantilesSolo);
+    }
+
+    selectCat.innerHTML = '';
+    opciones.forEach(cat => {
+        const selected = (cat === categoriaElegida) ? 'selected' : '';
+        const nombreCat = cat.charAt(0).toUpperCase() + cat.slice(1);
+        selectCat.innerHTML += `<option value="${cat}" ${selected}>${nombreCat}</option>`;
+    });
+}
 
 // --- PRODUCTOS CRUD ---
 function agregarProducto() {
@@ -252,14 +299,15 @@ function abrirEditor(event, id) {
     document.getElementById('edit-precio').value = p.precio; 
     document.getElementById('edit-desc').value = p.descripcion || ''; 
     document.getElementById('edit-publico').value = p.publico; 
-    document.getElementById('edit-categoria').value = p.categoria; 
+    
+    // Inyectamos talles y categorías correspondientes antes de abrir
+    actualizarTalles('edit-publico', 'talles-edit-container', 'edit-talle', p.talles || []);
+    actualizarCategoriasSelect('edit-publico', 'edit-categoria', p.categoria);
+    
     document.getElementById('edit-foto1').value = p.images[0] || ''; 
     document.getElementById('edit-foto2').value = p.images[1] || ''; 
     document.getElementById('edit-foto3').value = p.images[2] || '';
-    
-    // Acá inyectamos los talles correctos (adultos o infantiles) y marcamos los que el producto ya tiene
-    actualizarTalles('edit-publico', 'talles-edit-container', 'edit-talle', p.talles || []);
-    
+
     document.getElementById('edit-modal').style.display = 'flex';
 }
 
@@ -393,9 +441,17 @@ function switchView(v, aud = null) {
     window.scrollTo(0,0);
 }
 function switchAudience(aud) {
-    currentAudience = aud; document.querySelectorAll('.aud-btn').forEach(btn => btn.classList.remove('active'));
+    currentAudience = aud; 
+    document.querySelectorAll('.aud-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById('btn-' + aud).classList.add('active');
     document.getElementById('collection-title').innerText = aud === 'todos' ? 'Colección Completa' : "Colección " + aud.charAt(0).toUpperCase() + aud.slice(1);
+    
+    // Si pasamos a "Adultos" y estaba seleccionada una categoría exclusiva de niños, reseteamos a 'todos'
+    if (aud === 'adultos' && categoriasInfantilesSolo.includes(currentCategory)) {
+        currentCategory = 'todos';
+    }
+    
+    renderCategoryNav(); // Recarga los botones de categoría
     renderProducts();
 }
 function filterCategory(cat, btn) {
